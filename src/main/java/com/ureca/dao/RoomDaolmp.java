@@ -45,7 +45,7 @@ public class RoomDaolmp implements RoomDao {
         List<Room> rooms = new ArrayList<>();
         try {
             con = dbutil.getConnection();
-            String sql = "SELECT id, room_id, price FROM Room";
+            String sql = "SELECT id, room_size, price FROM Room";
             stmt = con.prepareStatement(sql);
             rs = stmt.executeQuery();
             while (rs.next()) {

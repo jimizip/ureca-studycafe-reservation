@@ -59,7 +59,6 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
             rs = stmt.executeQuery();
             while (rs.next()) {
                 Room_history reserve = new Room_history();
-                reserve.setId(rs.getInt("id"));
                 reserve.setRoom_id(rs.getInt("room_id"));
                 reserve.setUser_id(rs.getInt("user_id"));
                 reserve.setStart_time(rs.getTimestamp("start_time").toLocalDateTime());
@@ -96,7 +95,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	};
 	
 	@Override
-	public void updateRserve(Room_history reserve) throws SQLException {
+	public void updateRserve(int room_id, Room_history reserve) throws SQLException {
 	    Connection con = null;
 	    PreparedStatement stmt = null;
 	    try {
@@ -109,7 +108,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	        stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getStart_time()));
 	        stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getEnd_time()));
 	        stmt.setInt(idx++, reserve.getUser_count());
-	        stmt.setInt(idx++, reserve.getId());
+	        stmt.setInt(idx++, room_id);
 	        stmt.executeUpdate();
 	    } finally {
 	        dbutil.close(stmt, con);
@@ -122,7 +121,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	    PreparedStatement stmt = null;
 	    try {
 	        con = dbutil.getConnection();
-	        String sql = "DELETE FROM Room_history WHERE room_id = ?";
+	        String sql = "DELETE FROM Room_history WHERE id = ?";
 	        stmt = con.prepareStatement(sql);
 	        stmt.setInt(1, room_id);
 	        stmt.executeUpdate();

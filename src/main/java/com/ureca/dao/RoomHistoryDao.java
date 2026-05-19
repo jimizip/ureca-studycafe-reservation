@@ -12,7 +12,7 @@ public interface RoomHistoryDao {
 	
 	void setReserve(Room_history reserve) throws SQLException;
 
-	void updateRserve(Room_history reserve) throws SQLException;
+	void updateRserve(int room_id, Room_history reserve) throws SQLException;
 	
 	void removeReserve(int room_id) throws SQLException;
 }
