@@ -45,7 +45,7 @@ public class Room_history {
 	public void setUser_id(int user_id) {
 		this.user_id = user_id;
 	}
-	public int getUser_id(int user_id) {
+	public int getUser_id() {
 		return this.user_id;
 	}
 	public void setStart_time(LocalDateTime start_time) {
