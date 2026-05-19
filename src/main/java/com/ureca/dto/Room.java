@@ -27,10 +27,10 @@ public class Room implements Comparable<Room>, Serializable{
 	
 	
 	
-	public void setID(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	public int getID() {
+	public int getId() {
 		return this.id;
 	}
 	public void setRoom_size(int room_size) {
@@ -46,7 +46,9 @@ public class Room implements Comparable<Room>, Serializable{
 		return this.price;
 	}
 	
-	public String toSTring() {
-		return "id =" + id + " room_size=" + room_size + " price =" + price;
+	@Override
+	public String toString() {
+		return "Room [id=" + id + ", room_size=" + room_size + ", price=" + price + "]";
 	}
+	
 }
