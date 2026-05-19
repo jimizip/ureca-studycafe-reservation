@@ -1,4 +1,4 @@
-package dao;
+package com.ureca.dao;
 
 public class RoomDAO {
 

@@ -1,4 +1,4 @@
-package service;
+package com.ureca.service;
 
 public class StudyCafeService {
 
