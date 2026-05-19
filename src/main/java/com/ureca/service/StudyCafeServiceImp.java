@@ -18,7 +18,12 @@ public class StudyCafeServiceImp implements StudyCafeService {
     // 유저 등록
     @Override
     public void addUser(User user) {
-        try {
+    	try {
+            // 이메일 중복 체크
+            User find = userDao.searchByEmail(user.getEmail());
+            if (find != null) {
+                throw new RuntimeException("이미 등록된 이메일입니다.");
+            }
             userDao.add(user);
         } catch (SQLException e) {
             e.printStackTrace();

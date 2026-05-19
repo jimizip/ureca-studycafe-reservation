@@ -94,4 +94,30 @@ public class UserDaoImp implements UserDao {
         }
         return users;
     }
+    
+    // 이미 있는 유저 등록할 때 (이메일로 중복 체크할 수 있도록)
+    @Override
+    public User searchByEmail(String email) throws SQLException {
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con = dbutil.getConnection();
+            String sql = "SELECT id, name, tel, email FROM User WHERE email = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, email);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setName(rs.getString("name"));
+                user.setTel(rs.getString("tel"));
+                user.setEmail(rs.getString("email"));
+                return user;
+            }
+        } finally {
+            dbutil.close(rs, stmt, con);
+        }
+        return null;
+    }
 }
