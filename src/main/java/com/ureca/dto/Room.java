@@ -36,7 +36,7 @@ public class Room implements Comparable<Room>, Serializable{
 	public void setRoom_size(int room_size) {
 		this.room_size = room_size;
 	}
-	public int getRoom_size(int room_size) {
+	public int getRoom_size() {
 		return this.room_size;
 	}
 	public void setPrice(int price) {

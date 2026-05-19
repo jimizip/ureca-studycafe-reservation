@@ -88,6 +88,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
             stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getStart_time()));
             stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getEnd_time()));
             stmt.setInt(idx++, reserve.getUser_count());
+            stmt.executeUpdate();
         }
         finally {
         	dbutil.close(stmt, con);
@@ -121,7 +122,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	    PreparedStatement stmt = null;
 	    try {
 	        con = dbutil.getConnection();
-	        String sql = "DELET FROM Room_history WHERE room_id = ?";
+	        String sql = "DELETE FROM Room_history WHERE room_id = ?";
 	        stmt = con.prepareStatement(sql);
 	        stmt.setInt(1, room_id);
 	        stmt.executeUpdate();
