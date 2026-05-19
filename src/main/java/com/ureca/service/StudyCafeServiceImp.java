@@ -5,9 +5,8 @@ import java.util.List;
 
 import com.ureca.dao.UserDao;
 import com.ureca.dao.PaymentHistoryDao;
-import com.ureca.dto.User;
-import com.ureca.dto.PaymentHistory;
 import com.ureca.util.StudyCafeFactory;
+import com.ureca.dto.*;
 
 public class StudyCafeServiceImp implements StudyCafeService {
 
@@ -22,7 +21,7 @@ public class StudyCafeServiceImp implements StudyCafeService {
             // 이메일 중복 체크
             User find = userDao.searchByEmail(user.getEmail());
             if (find != null) {
-                throw new RuntimeException("이미 등록된 이메일입니다.");
+            	throw new DuplicateException("이미 등록된 이메일입니다.");
             }
             userDao.add(user);
         } catch (SQLException e) {
