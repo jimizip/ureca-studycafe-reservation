@@ -11,6 +11,7 @@ public interface StudyCafeService {
     // User
     void addUser(User user);                    // 유저 등록
     List<User> searchAllUsers();                // 유저 전체 조회
+    User searchUser(int id);
 
     // 나중에 추가 - 예약 예시
     // void reserve(RoomHistory history);          // 예약 등록 

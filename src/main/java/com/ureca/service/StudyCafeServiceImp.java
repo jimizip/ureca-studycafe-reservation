@@ -29,6 +29,18 @@ public class StudyCafeServiceImp implements StudyCafeService {
             throw new RuntimeException("유저 등록 중 오류 발생");
         }
     }
+    
+    @Override
+    public User searchUser(int id) {
+        try {
+            User user = userDao.search(id);
+            if (user == null) throw new CanNotFindException("존재하지 않는 유저입니다.");
+            return user;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("유저 조회 중 오류 발생");
+        }
+    }
 
     // 유저 전체 조회
     @Override
