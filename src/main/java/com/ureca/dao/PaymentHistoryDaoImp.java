@@ -102,4 +102,18 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
             dbutil.close(stmt, con);
         }
     }
+    
+    // 예약 수정 시 금액 UPDATE
+    public void updateByHistory(Connection con, int historyId, int price) throws SQLException {
+        PreparedStatement stmt = null;
+        try {
+            String sql = "UPDATE payment_history SET price = ? WHERE id = ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setInt(1, price);
+            stmt.setInt(2, historyId);
+            stmt.executeUpdate();
+        } finally {
+            dbutil.close(stmt);
+        }
+    }
 }
