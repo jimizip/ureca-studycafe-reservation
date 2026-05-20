@@ -47,6 +47,18 @@ public class StudyCafeServiceImp implements StudyCafeService {
             throw new RuntimeException("유저 조회 중 오류 발생");
         }
     }
+    
+    @Override
+    public User searchUserByEmail(String email) {
+        try {
+            User user = userDao.searchByEmail(email);
+            if (user == null) throw new CanNotFindException("존재하지 않는 이메일입니다.");
+            return user;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("유저 조회 중 오류 발생");
+        }
+    }
 
     // 유저 전체 조회
     @Override

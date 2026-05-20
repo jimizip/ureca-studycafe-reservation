@@ -7,7 +7,7 @@ import com.ureca.service.StudyCafeService;
 import com.ureca.service.StudyCafeServiceImp;
 
 public class LoginPanel extends JFrame {
-    private JTextField userIdTf;
+    private JTextField emailTf;  // userIdTf → emailTf
     private JButton loginBt;
     private MessageDialog dialog;
     private StudyCafeService service = new StudyCafeServiceImp();
@@ -22,9 +22,9 @@ public class LoginPanel extends JFrame {
 
         JPanel inputPan = new JPanel(new GridLayout(2, 2, 10, 10));
         inputPan.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
-        inputPan.add(new JLabel("유저 ID"));
-        userIdTf = new JTextField();
-        inputPan.add(userIdTf);
+        inputPan.add(new JLabel("이메일"));  // "유저 ID" → "이메일"
+        emailTf = new JTextField();
+        inputPan.add(emailTf);
 
         JPanel buttonPan = new JPanel(new FlowLayout());
         loginBt = new JButton("로그인");
@@ -32,12 +32,14 @@ public class LoginPanel extends JFrame {
 
         loginBt.addActionListener(e -> {
             try {
-                int userId = Integer.parseInt(userIdTf.getText());
-                User user = service.searchUser(userId);
+                String email = emailTf.getText();
+                if (email.isEmpty()) {
+                    dialog.show("이메일을 입력해주세요");
+                    return;
+                }
+                User user = service.searchUserByEmail(email);
                 new MainFrame(user);
                 setVisible(false);
-            } catch (NumberFormatException ex) {
-                dialog.show("ID는 숫자로 입력해주세요");
             } catch (Exception ex) {
                 dialog.show(ex.getMessage());
             }
