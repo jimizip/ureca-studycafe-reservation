@@ -11,6 +11,7 @@ public interface StudyCafeService {
     List<User> searchAllUsers();                // 유저 전체 조회
     User searchUser(int id);
     void removeUser(int id);
+    User searchUserByEmail(String email);
 
     // 예약 - 현빈
     void reserve(Room_history history); // 예약 등록
