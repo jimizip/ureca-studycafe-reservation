@@ -53,12 +53,13 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
         List<Room_history> reserves = new ArrayList<>();
         try {
             con = dbutil.getConnection();
-            String sql = "SELECT room_id, user_id, start_time, end_time, user_count from Room_history where user_id = ?";
+            String sql = "SELECT id, room_id, user_id, start_time, end_time, user_count from Room_history where user_id = ?";
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, user_id);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 Room_history reserve = new Room_history();
+                reserve.setId(user_id);
                 reserve.setRoom_id(rs.getInt("room_id"));
                 reserve.setUser_id(rs.getInt("user_id"));
                 reserve.setStart_time(rs.getTimestamp("start_time").toLocalDateTime());
@@ -95,12 +96,11 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	};
 	
 	@Override
-	public void updateRserve(int room_id, Room_history reserve) throws SQLException {
-	    Connection con = null;
+	public void updateReserve(int id, Room_history reserve, Connection con) throws SQLException {
 	    PreparedStatement stmt = null;
 	    try {
-	        con = dbutil.getConnection();
-	        String sql = "UPDATE Room_history SET room_id = ?, user_id = ?, start_time = ?, end_time = ?, user_count = ? WHERE id = ?";
+	        // con을 파라미터로 받아서 씀 (내부에서 새로 만들면 안 됨)
+	        String sql = "UPDATE Room_history SET room_id=?, user_id=?, start_time=?, end_time=?, user_count=? WHERE id=?";
 	        stmt = con.prepareStatement(sql);
 	        int idx = 1;
 	        stmt.setInt(idx++, reserve.getRoom_id());
@@ -108,22 +108,22 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	        stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getStart_time()));
 	        stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getEnd_time()));
 	        stmt.setInt(idx++, reserve.getUser_count());
-	        stmt.setInt(idx++, room_id);
+	        stmt.setInt(idx++, id);
 	        stmt.executeUpdate();
 	    } finally {
-	        dbutil.close(stmt, con);
+	        dbutil.close(stmt); // con은 여기서 닫으면 안 됨. Service에서 닫음
 	    }
 	}
 	
 	@Override
-	public void removeReserve(int room_id) throws SQLException {
+	public void removeReserve(int id) throws SQLException {
 	    Connection con = null;
 	    PreparedStatement stmt = null;
 	    try {
 	        con = dbutil.getConnection();
 	        String sql = "DELETE FROM Room_history WHERE id = ?";
 	        stmt = con.prepareStatement(sql);
-	        stmt.setInt(1, room_id);
+	        stmt.setInt(1, id);
 	        stmt.executeUpdate();
 	    } finally {
 	        dbutil.close(stmt, con);

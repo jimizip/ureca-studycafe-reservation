@@ -7,6 +7,8 @@ import com.ureca.dto.User;
 import com.ureca.dto.Room_history;
 import com.ureca.service.StudyCafeService;
 import com.ureca.service.StudyCafeServiceImp;
+import java.util.List;
+import java.time.LocalDateTime;
 
 public class ReservationPanel extends JPanel {
     private MessageDialog dialog;
@@ -48,9 +50,8 @@ public class ReservationPanel extends JPanel {
         // 내 예약 조회
         searchBt.addActionListener(e -> {
             try {
-                // TODO: service.searchHistoryByUser(currentUser.getId()) 연결
-                // showList(service.searchHistoryByUser(currentUser.getId()));
-                dialog.show("서비스 연결 후 동작");
+                List<Room_history> list = service.searchHistoryByUser(currentUser.getId());
+                showList(list);
             } catch (Exception ex) {
                 dialog.show(ex.getMessage());
             }
@@ -63,7 +64,24 @@ public class ReservationPanel extends JPanel {
                 dialog.show("수정할 예약을 선택해주세요");
                 return;
             }
-            // TODO: service.updateReservation() 연결
+            try {
+                // 선택된 예약 정보 가져오기
+                Room_history selected = new Room_history();
+                selected.setId(Integer.parseInt(tableModel.getValueAt(row, 0).toString()));
+                selected.setRoom_id(Integer.parseInt(tableModel.getValueAt(row, 1).toString()));
+                selected.setUser_id(Integer.parseInt(tableModel.getValueAt(row, 2).toString()));
+                selected.setStart_time((LocalDateTime) tableModel.getValueAt(row, 3));
+                selected.setEnd_time((LocalDateTime) tableModel.getValueAt(row, 4));
+                selected.setUser_count(Integer.parseInt(tableModel.getValueAt(row, 5).toString()));
+
+                // 수정 폼 띄우기
+                new UpdateReservationForm(currentUser, selected, service, () -> {
+                    List<Room_history> list = service.searchHistoryByUser(currentUser.getId());
+                    showList(list);
+                }).show();
+            } catch (Exception ex) {
+                dialog.show(ex.getMessage());
+            }
         });
 
         // 예약 취소
@@ -73,10 +91,16 @@ public class ReservationPanel extends JPanel {
                 dialog.show("취소할 예약을 선택해주세요");
                 return;
             }
-            // TODO
-            // int historyId = (int) tableModel.getValueAt(row, 0);
-            // service.cancel(historyId);
-            dialog.show("서비스 연결 후 동작");
+            try {
+                // 이거 수정
+                int historyId = Integer.parseInt(tableModel.getValueAt(row, 0).toString());
+                service.cancel(historyId);
+                dialog.show("예약이 취소되었습니다.");
+                List<Room_history> list = service.searchHistoryByUser(currentUser.getId());
+                showList(list);
+            } catch (Exception ex) {
+                dialog.show(ex.getMessage());
+            }
         });
 
         add(topPan, BorderLayout.NORTH);

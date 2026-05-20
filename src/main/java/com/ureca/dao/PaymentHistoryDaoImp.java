@@ -112,6 +112,9 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
             stmt.setInt(1, price);
             stmt.setInt(2, historyId);
             stmt.executeUpdate();
+            
+            // throw new SQLException("테스트용 강제 오류");
+            
         } finally {
             dbutil.close(stmt);
         }
