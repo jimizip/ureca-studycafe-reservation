@@ -13,17 +13,14 @@ import com.ureca.dto.Room_history;
 import com.ureca.util.DBUtil;
 
 public class RoomHistoryDaolmp implements RoomHistoryDao{
-	
 	private DBUtil dbutil = DBUtil.getInstance();
 	
 	@Override
-	public List<Room_history> getReservation(int room_id,LocalDateTime date) throws SQLException{
-		Connection con = null;
+	public List<Room_history> getReservation(Connection con, int room_id,LocalDateTime date) throws SQLException{
 	    PreparedStatement stmt = null;
 	    ResultSet rs = null;
 	    List<Room_history> reserves = new ArrayList<>();
 	    try {
-	        con = dbutil.getConnection();
 	        String sql = "SELECT id, room_id, user_id, start_time, end_time, user_count FROM Room_history WHERE room_id = ? AND DATE(start_time) = DATE(?)";
 	        stmt = con.prepareStatement(sql);
 	        stmt.setInt(1, room_id);
@@ -40,7 +37,8 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	            reserves.add(reserve);
 	        }
 	    } finally {
-	        dbutil.close(rs, stmt, con);
+	        rs.close();
+	        stmt.close();
 	    }
 	    return reserves;
 	};
@@ -53,12 +51,13 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
         List<Room_history> reserves = new ArrayList<>();
         try {
             con = dbutil.getConnection();
-            String sql = "SELECT room_id, user_id, start_time, end_time, user_count from Room_history where user_id = ?";
+            String sql = "SELECT id, room_id, user_id, start_time, end_time, user_count from Room_history where user_id = ?";
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, user_id);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 Room_history reserve = new Room_history();
+                reserve.setId(user_id);
                 reserve.setRoom_id(rs.getInt("room_id"));
                 reserve.setUser_id(rs.getInt("user_id"));
                 reserve.setStart_time(rs.getTimestamp("start_time").toLocalDateTime());
