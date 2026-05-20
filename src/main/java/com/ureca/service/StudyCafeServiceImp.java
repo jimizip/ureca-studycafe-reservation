@@ -176,7 +176,10 @@ public class StudyCafeServiceImp implements StudyCafeService {
     		con = dbutil.getConnection();
     		//트랜잭션 시작
     		con.setAutoCommit(false);
-    		roomHistoryDao.setReserve(history, con);
+    		
+    		// RoomHistory INSERT -> 생성된 id 받아오기
+            int generatedId = roomHistoryDao.setReserve(history, con);
+            history.setId(generatedId); // history에 id 세팅
     		
     		// 금액 재계산 (시간 * 룸 가격)
             Room room = roomDao.search(history.getRoom_id());
@@ -185,7 +188,14 @@ public class StudyCafeServiceImp implements StudyCafeService {
             );
             
             int price = (int) (room.getPrice() * hours);
-            paymentHistoryDao.updateByHistory(con, history.getId(), price);
+            // Payment INSERT
+            PaymentHistory payment = new PaymentHistory();
+            payment.setUserId(history.getUser_id());
+            payment.setRoomId(history.getRoom_id());
+            payment.setPrice(price);
+            payment.setPaymentDate(LocalDateTime.now());
+            payment.setRoomHistoryId(history.getId());
+            paymentHistoryDao.add(payment, con);
 
     		//성공 시 커밋
     		con.commit();
