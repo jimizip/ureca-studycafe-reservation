@@ -123,8 +123,8 @@ public class ReservationPanel extends JPanel {
         for (Room_history r : list)
             tableModel.addRow(new Object[]{
                 r.getId(), r.getRoom_id(), r.getUser_id(),
-                r.getStart_time().toString().replace("T", " "),
-                r.getEnd_time().toString().replace("T", " "),
+                r.getStart_time(),
+                r.getEnd_time(),
                 r.getUser_count()});
     }
 }
