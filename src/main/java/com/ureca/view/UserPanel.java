@@ -92,10 +92,13 @@ public class UserPanel extends JPanel {
         // 삭제
         deleteBt.addActionListener(e -> {
             try {
-                // TODO: service.removeUser() 연결
+                int id = Integer.parseInt(searchIdTf.getText());
+                service.removeUser(id);
                 dialog.show("삭제 성공");
                 showList();
                 clear();
+            } catch (NumberFormatException ex) {
+                dialog.show("ID를 입력해주세요");
             } catch (Exception ex) {
                 dialog.show(ex.getMessage());
             }

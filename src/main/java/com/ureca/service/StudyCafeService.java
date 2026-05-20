@@ -10,6 +10,7 @@ public interface StudyCafeService {
     void addUser(User user);                    // 유저 등록
     List<User> searchAllUsers();                // 유저 전체 조회
     User searchUser(int id);
+    void removeUser(int id);
 
     // 예약 - 현빈
     void reserve(Room_history history); // 예약 등록
@@ -17,10 +18,9 @@ public interface StudyCafeService {
     List<Boolean> getBookedHours(int roomId, LocalDateTime date); // 룸, 날짜 기준 예약 가능 시간 조회
 
     // 예약 - 지민
-//    void updateReservation(Room_history history); // 예약 수정
-//    void cancel(int historyId); // 예약 취소
-//    List<Room_history> searchHistoryByUser(int userId); // 유저별 예약 조회 
-//    List<Room_history> searchAllHistory(); // 전체 예약 조회
+    void updateReservation(Room_history history); // 예약 수정
+    void cancel(int historyId); // 예약 취소
+    List<Room_history> searchHistoryByUser(int userId); // 유저별 예약 조회 
 
     // 결제
     List<PaymentHistory> searchPaymentByUser(int userId); // 유저별 결제 내역 조회
