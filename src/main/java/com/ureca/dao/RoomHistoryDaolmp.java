@@ -73,11 +73,9 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	}
 	
 	@Override
-	public void setReserve(Room_history reserve) throws SQLException{
-		Connection con = null;
+	public void setReserve(Room_history reserve, Connection con) throws SQLException{
         PreparedStatement stmt = null;
         try {
-            con = dbutil.getConnection();
             String sql = " Insert INTO Room_history(id, room_id, user_id, start_time, end_time, user_count) VALUES(?, ?, ?, ?, ?, ?) ";
             stmt = con.prepareStatement(sql);
             int idx = 1;
@@ -90,7 +88,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
             stmt.executeUpdate();
         }
         finally {
-        	dbutil.close(stmt, con);
+        	stmt.close();
         }
 	};
 	

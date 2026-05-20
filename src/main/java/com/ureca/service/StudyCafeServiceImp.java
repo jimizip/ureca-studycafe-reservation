@@ -157,12 +157,34 @@ public class StudyCafeServiceImp implements StudyCafeService {
     
     // 예약 등록
     public void reserve(Room_history history) {
-    	try { 
-    		roomHistoryDao.setReserve(history);
+    	Connection con = null;
+    	DBUtil dbutil = DBUtil.getInstance();
+    	
+    	try {
+    		con = dbutil.getConnection();
+    		//트랜잭션 시작
+    		con.setAutoCommit(false);
+    		roomHistoryDao.setReserve(history, con);
+    		//성공 시 커밋
+    		con.commit();
     	}
     	catch(SQLException e) {
+    		try {
+
+                if (con != null) {
+                    con.rollback();
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new RuntimeException("예약 등록 중 롤백 오류");
+            }
+    		
     		e.printStackTrace();
             throw new RuntimeException("룸 예약 중 오류 발생" + history.toString());
+    	}
+    	finally {
+    		dbutil.close(con);
     	}
     	
     }
@@ -203,6 +225,7 @@ public class StudyCafeServiceImp implements StudyCafeService {
 
     	             if (start.isBefore(slotEnd) &&
     	                 end.isAfter(slotStart)) {
+    	            	 //회의실 예약 여부 list return
     	                 isUsed.set(i, true);
     	             }
     	         }
