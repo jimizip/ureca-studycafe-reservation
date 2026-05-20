@@ -78,7 +78,7 @@ public class StudyCafeServiceImp implements StudyCafeService {
             return paymentHistoryDao.searchByUser(userId);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException("사용 내역 조회 중 오류 발생");
+            throw new ReservationException("사용 내역 조회 중 오류 발생");
         }
     }
   
@@ -165,24 +165,26 @@ public class StudyCafeServiceImp implements StudyCafeService {
     		//트랜잭션 시작
     		con.setAutoCommit(false);
     		roomHistoryDao.setReserve(history, con);
+    		
+    		// 금액 재계산 (시간 * 룸 가격)
+            Room room = roomDao.search(history.getRoom_id());
+            long hours = java.time.temporal.ChronoUnit.HOURS.between(
+                history.getStart_time(), history.getEnd_time()
+            );
+            
+            int price = (int) (room.getPrice() * hours);
+            paymentHistoryDao.updateByHistory(con, history.getId(), price);
+
     		//성공 시 커밋
     		con.commit();
     	}
     	catch(SQLException e) {
-    		try {
-
-                if (con != null) {
-                    con.rollback();
-                }
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                throw new RuntimeException("예약 등록 중 롤백 오류");
+    		try { 
+    			if (con != null) { con.rollback();}
+    			} catch(Exception ex) {ex.printStackTrace(); }
+    			e.printStackTrace();
+    			throw new ReservationException("예약 수정 중 오류 발생");
             }
-    		
-    		e.printStackTrace();
-            throw new RuntimeException("룸 예약 중 오류 발생" + history.toString());
-    	}
     	finally {
     		dbutil.close(con);
     	}
@@ -195,7 +197,7 @@ public class StudyCafeServiceImp implements StudyCafeService {
     	}
     	catch(SQLException e) {
     		e.printStackTrace();
-            throw new RuntimeException("예약할 룸 목록 조회 중 오류 발생");
+            throw new ReservationException("예약할 룸 목록 조회 중 오류 발생");
     	}
     } 	
     
@@ -204,25 +206,19 @@ public class StudyCafeServiceImp implements StudyCafeService {
     public List<Boolean> getBookedHours(int roomId, LocalDateTime date){
     	 try {
     	     List<Boolean> isUsed = new ArrayList<>();
-
     	     for (int i = 0; i < 24; i++) {
     	         isUsed.add(false);
     	     }
-
-    	     List<Room_history> history =
-    	             roomHistoryDao.getReservation(roomId, date);
+    	     List<Room_history> history = roomHistoryDao.getReservation(roomId, date);
 
     	     for (Room_history his : history) {
-
     	         LocalTime start = his.getStart_time().toLocalTime();
     	         LocalTime end = his.getEnd_time().toLocalTime();
 
     	         for (int i = 0; i < 24; i++) {
-
     	             LocalTime slotStart = LocalTime.of(i, 0);
     	             LocalTime slotEnd = (i == 23)	? LocalTime.MAX
-    	                								: LocalTime.of(i + 1, 0);
-
+    	                							: LocalTime.of(i + 1, 0);
     	             if (start.isBefore(slotEnd) &&
     	                 end.isAfter(slotStart)) {
     	            	 //회의실 예약 여부 list return
@@ -231,12 +227,10 @@ public class StudyCafeServiceImp implements StudyCafeService {
     	         }
     	     }
     	     return isUsed;
-
     	    }
-    	
     	catch(SQLException e) {
     		e.printStackTrace();
-    		throw new RuntimeException("예약 가능 시간 조회 중 오류 발생");
+    		throw new ReservationException("예약 가능 시간 조회 중 오류 발생");
     	}
     }
 }
