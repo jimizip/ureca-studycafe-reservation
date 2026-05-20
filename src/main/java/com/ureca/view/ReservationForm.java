@@ -9,6 +9,8 @@ import java.util.List;
 import com.ureca.dto.Room_history;
 import com.ureca.dto.User;
 import com.ureca.service.StudyCafeService;
+import com.ureca.dto.Room;
+import java.util.List;
 
 public class ReservationForm {
     private JFrame form;
@@ -80,22 +82,34 @@ public class ReservationForm {
             selectedRoomL.setText("선택된 룸: 없음");
             selectedTimeL.setText("선택된 시간: 없음");
 
-            // TODO: service.searchAvailableRooms() 연결
-            // 임시 룸 버튼
-            for (int i = 1; i <= 3; i++) {
-                final int roomId = i;
-                JButton roomBt = new JButton(
-                    "룸" + roomId + " | 수용인원: 4명 | 시간당: 5,000원"
-                );
-                roomBt.addActionListener(ev -> {
-                    selectedRoomId = roomId;
-                    selectedRoomL.setText("룸" + roomId + " (4명 / 5,000원)");
-                    showTimeButtons(roomId);
-                });
-                roomButtonPan.add(roomBt);
+            try {
+                int year  = (int) yearSp.getValue();
+                int month = (int) monthSp.getValue();
+                int day   = (int) daySp.getValue();
+                LocalDateTime start = LocalDateTime.of(year, month, day, 0, 0);
+                LocalDateTime end   = LocalDateTime.of(year, month, day, 23, 59);
+
+                // searchAvailableRooms() 연결
+                List<Room> rooms = service.searchAvailableRooms(start, end);
+                for (Room room : rooms) {
+                    final int roomId = room.getId();
+                    JButton roomBt = new JButton(
+                        "룸" + roomId + " | 수용인원: " + room.getRoom_size() + "명 | 시간당: " +
+                        String.format("%,d", room.getPrice()) + "원"
+                    );
+                    roomBt.addActionListener(ev -> {
+                        selectedRoomId = roomId;
+                        selectedRoomL.setText("룸" + roomId + " (" + room.getRoom_size() + "명 / " +
+                            String.format("%,d", room.getPrice()) + "원)");
+                        showTimeButtons(roomId, LocalDateTime.of(year, month, day, 0, 0));
+                    });
+                    roomButtonPan.add(roomBt);
+                }
+                roomButtonPan.revalidate();
+                roomButtonPan.repaint();
+            } catch (Exception ex) {
+                dialog.show(ex.getMessage());
             }
-            roomButtonPan.revalidate();
-            roomButtonPan.repaint();
         });
 
         // ===== 예약 정보 패널 =====
@@ -162,8 +176,8 @@ public class ReservationForm {
                 history.setEnd_time(end);
                 history.setUser_count(count);
 
-                // TODO: service.reserve(history) 연결
-                // service.reserve(history);
+                // reserve() 연결
+                service.reserve(history);
 
                 dialog.show("예약 완료! " + startH + ":00 ~ " + endH + ":00");
                 form.setVisible(false);
@@ -190,53 +204,46 @@ public class ReservationForm {
     }
 
     // 룸 클릭 시 시간 버튼 생성
-    private void showTimeButtons(int roomId) {
+    private void showTimeButtons(int roomId, LocalDateTime date) {
         timeButtonPan.removeAll();
         timeButtons.clear();
         selectedHours.clear();
         selectedTimeL.setText("선택된 시간: 없음");
 
-        // TODO: 실제 예약된 시간 service에서 가져오기
-        // 임시로 10:00, 11:00 예약된 것으로 처리
-        List<Integer> bookedHours = new ArrayList<>();
-        bookedHours.add(10);
-        bookedHours.add(11);
+        // getBookedHours() 연결
+        List<Boolean> bookedHours = service.getBookedHours(roomId, date);
 
         for (int hour = 9; hour < 22; hour++) {
             final int h = hour;
             JButton timeBt = new JButton(hour + ":00");
             timeBt.setPreferredSize(new Dimension(80, 40));
 
-            if (bookedHours.contains(hour)) {
+            if (bookedHours.get(hour)) {
                 // 이미 예약된 시간 - 빨간색 비활성화
                 timeBt.setBackground(Color.RED);
                 timeBt.setForeground(Color.WHITE);
                 timeBt.setEnabled(false);
             } else {
-                // 예약 가능한 시간 - 클릭 시 파란색
-            	timeBt.addActionListener(ev -> {
-            	    if (selectedHours.contains(h)) {
-            	        // 선택 해제
-            	        selectedHours.remove(Integer.valueOf(h));
-            	        timeBt.setBackground(null);
-            	        timeBt.setBorder(UIManager.getBorder("Button.border"));
-            	    } else {
-            	        // 연속성 체크
-            	        if (!selectedHours.isEmpty()) {
-            	            int min = Collections.min(selectedHours);
-            	            int max = Collections.max(selectedHours);
-            	            if (h != min - 1 && h != max + 1) {
-            	                dialog.show("연속된 시간만 선택 가능합니다.");
-            	                return;
-            	            }
-            	        }
-            	        selectedHours.add(h);
-            	        // 색깔 대신 테두리로 표시
-            	        timeBt.setBackground(new Color(173, 216, 230)); // 연한 파란색
-            	        timeBt.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
-            	    }
-            	    updateSelectedTimeLabel();
-            	});
+                timeBt.addActionListener(ev -> {
+                    if (selectedHours.contains(h)) {
+                        selectedHours.remove(Integer.valueOf(h));
+                        timeBt.setBackground(null);
+                        timeBt.setBorder(UIManager.getBorder("Button.border"));
+                    } else {
+                        if (!selectedHours.isEmpty()) {
+                            int min = Collections.min(selectedHours);
+                            int max = Collections.max(selectedHours);
+                            if (h != min - 1 && h != max + 1) {
+                                dialog.show("연속된 시간만 선택 가능합니다.");
+                                return;
+                            }
+                        }
+                        selectedHours.add(h);
+                        timeBt.setBackground(new Color(173, 216, 230));
+                        timeBt.setBorder(BorderFactory.createLineBorder(Color.BLUE, 3));
+                    }
+                    updateSelectedTimeLabel();
+                });
             }
             timeButtons.add(timeBt);
             timeButtonPan.add(timeBt);
@@ -245,7 +252,6 @@ public class ReservationForm {
         timeButtonPan.repaint();
     }
 
-    // 선택된 시간 라벨 업데이트
     private void updateSelectedTimeLabel() {
         if (selectedHours.isEmpty()) {
             selectedTimeL.setText("선택된 시간: 없음");
