@@ -16,7 +16,7 @@ public interface PaymentHistoryDao {
     List<PaymentHistory> searchByUser(int userId) throws SQLException;
     
     // 결제 취소
-    void remove(int id)                           throws SQLException;
+    void remove(int historyId, Connection con)                           throws SQLException;
     
     // 예약 수정 시 금액 업데이트 
     void updateByHistory(Connection con, int historyId, int price) throws SQLException;

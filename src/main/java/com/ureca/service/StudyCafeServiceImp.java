@@ -147,12 +147,28 @@ public class StudyCafeServiceImp implements StudyCafeService {
     // 예약 취소
     @Override
     public void cancel(int historyId) {
+    	Connection con = null;
         try {
-            roomHistoryDao.removeReserve(historyId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ReservationException("예약 취소 중 오류 발생");
-        }
+        	con = dbutil.getConnection();
+    		//트랜잭션 시작
+    		con.setAutoCommit(false);
+    		
+            roomHistoryDao.removeReserve(historyId, con);
+            paymentHistoryDao.remove(historyId, con);
+            
+          //성공 시 커밋
+    		con.commit();
+    		
+        } catch(SQLException e) {
+    		try { 
+    			if (con != null) { con.rollback();}
+    			} catch(Exception ex) {ex.printStackTrace(); }
+    			e.printStackTrace();
+    			throw new ReservationException("예약 취소 중 오류 발생");
+            }
+    	finally {
+    		dbutil.close(con);
+    	}
     }
 
     // 유저별 예약 조회

@@ -52,7 +52,8 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
         List<Room_history> reserves = new ArrayList<>();
         try {
             con = dbutil.getConnection();
-            String sql = "SELECT id, room_id, user_id, start_time, end_time, user_count from Room_history where user_id = ?";
+            String sql = "SELECT id, room_id, user_id, start_time, end_time, user_count FROM Room_history "
+	        		+ "WHERE user_id = ? and start_time > NOW()";
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, user_id);
             rs = stmt.executeQuery();
@@ -118,17 +119,15 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	}
 	
 	@Override
-	public void removeReserve(int id) throws SQLException {
-	    Connection con = null;
+	public void removeReserve(int historyId, Connection con) throws SQLException {
 	    PreparedStatement stmt = null;
 	    try {
-	        con = dbutil.getConnection();
 	        String sql = "DELETE FROM Room_history WHERE id = ?";
 	        stmt = con.prepareStatement(sql);
-	        stmt.setInt(1, id);
+	        stmt.setInt(1, historyId);
 	        stmt.executeUpdate();
 	    } finally {
-	        dbutil.close(stmt, con);
+	        dbutil.close(stmt);
 	    }
 	}
 }

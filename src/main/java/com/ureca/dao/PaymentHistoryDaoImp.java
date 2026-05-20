@@ -90,17 +90,16 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
 
     // 결제 취소 (삭제)
     @Override
-    public void remove(int id) throws SQLException {
-        Connection con = null;
+    public void remove(int historyId, Connection con) throws SQLException {
         PreparedStatement stmt = null;
         try {
             con = dbutil.getConnection();
             String sql = "DELETE FROM payment_history WHERE id = ?";
             stmt = con.prepareStatement(sql);
-            stmt.setInt(1, id);
+            stmt.setInt(1, historyId);
             stmt.executeUpdate();
         } finally {
-            dbutil.close(stmt, con);
+            dbutil.close(stmt);
         }
     }
     

@@ -17,5 +17,5 @@ public interface RoomHistoryDao {
     //예약 수정
 	void updateReserve(int id, Room_history reserve, Connection con) throws SQLException;
 	//예약 삭제
-	void removeReserve(int id) throws SQLException;
+	void removeReserve(int historyId, Connection con) throws SQLException;
 }
