@@ -153,8 +153,8 @@ public class StudyCafeServiceImp implements StudyCafeService {
     		//트랜잭션 시작
     		con.setAutoCommit(false);
     		
-            roomHistoryDao.removeReserve(historyId, con);
             paymentHistoryDao.remove(historyId, con);
+            roomHistoryDao.removeReserve(historyId, con);
             
           //성공 시 커밋
     		con.commit();
