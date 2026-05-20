@@ -93,8 +93,7 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
     public void remove(int historyId, Connection con) throws SQLException {
         PreparedStatement stmt = null;
         try {
-            con = dbutil.getConnection();
-            String sql = "DELETE FROM payment_history WHERE id = ?";
+        	String sql = "DELETE FROM payment_history WHERE room_history_id = ?";
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, historyId);
             stmt.executeUpdate();
