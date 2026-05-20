@@ -14,21 +14,20 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
 
     // 결제 내역 등록
     @Override
-    public void add(PaymentHistory payment) throws SQLException {
-        Connection con = null;
+    public void add(PaymentHistory payment, Connection con) throws SQLException {
         PreparedStatement stmt = null;
         try {
-            con = dbutil.getConnection();
-            String sql = "INSERT INTO payment_history(user_id, room_id, price, payment_date) VALUES(?, ?, ?, ?)";
+            String sql = "INSERT INTO payment_history(user_id, room_id, price, payment_date, room_history_id) VALUES(?, ?, ?, ?, ?)";
             stmt = con.prepareStatement(sql);
             int idx = 1;
             stmt.setInt(idx++, payment.getUserId());
             stmt.setInt(idx++, payment.getRoomId());
             stmt.setInt(idx++, payment.getPrice());
             stmt.setObject(idx++, payment.getPaymentDate());
+            stmt.setInt(idx++, payment.getRoomHistoryId());
             stmt.executeUpdate();
         } finally {
-            dbutil.close(stmt, con);
+            dbutil.close(stmt); // con 닫으면 안 됨
         }
     }
 
@@ -51,6 +50,7 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
                 p.setRoomId(rs.getInt("room_id"));
                 p.setPrice(rs.getInt("price"));
                 p.setPaymentDate(rs.getObject("payment_date", java.time.LocalDateTime.class));
+                p.setRoomHistoryId(rs.getInt("room_history_id"));
                 list.add(p);
             }
         } finally {
@@ -68,7 +68,7 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
         List<PaymentHistory> list = new ArrayList<>();
         try {
             con = dbutil.getConnection();
-            String sql = "SELECT id, user_id, room_id, price, payment_date FROM payment_history WHERE user_id = ?";
+            String sql = "SELECT id, user_id, room_id, price, payment_date, room_history_id FROM payment_history WHERE user_id = ?";
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, userId);
             rs = stmt.executeQuery();
@@ -79,6 +79,7 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
                 p.setRoomId(rs.getInt("room_id"));
                 p.setPrice(rs.getInt("price"));
                 p.setPaymentDate(rs.getObject("payment_date", java.time.LocalDateTime.class));
+                p.setRoomHistoryId(rs.getInt("room_history_id"));
                 list.add(p);
             }
         } finally {
@@ -104,17 +105,15 @@ public class PaymentHistoryDaoImp implements PaymentHistoryDao {
     }
     
     // 예약 수정 시 금액 UPDATE
-    public void updateByHistory(Connection con, int historyId, int price) throws SQLException {
+    @Override
+    public void updateByHistory(Connection con, int roomHistoryId, int price) throws SQLException {
         PreparedStatement stmt = null;
         try {
-            String sql = "UPDATE payment_history SET price = ? WHERE id = ?";
+            String sql = "UPDATE payment_history SET price = ? WHERE room_history_id = ?";
             stmt = con.prepareStatement(sql);
             stmt.setInt(1, price);
-            stmt.setInt(2, historyId);
+            stmt.setInt(2, roomHistoryId);
             stmt.executeUpdate();
-            
-            // throw new SQLException("테스트용 강제 오류");
-            
         } finally {
             dbutil.close(stmt);
         }

@@ -12,7 +12,7 @@ public interface RoomHistoryDao {
 	
 	List<Room_history> getHistory(int user_id) throws SQLException;
 	
-	void setReserve(Room_history reserve, Connection con) throws SQLException;
+    int setReserve(Room_history reserve, Connection con) throws SQLException;
 
 	void updateReserve(int id, Room_history reserve, Connection con) throws SQLException;
 	

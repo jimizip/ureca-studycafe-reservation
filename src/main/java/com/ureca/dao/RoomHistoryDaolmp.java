@@ -58,7 +58,7 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
             rs = stmt.executeQuery();
             while (rs.next()) {
                 Room_history reserve = new Room_history();
-                reserve.setId(user_id);
+                reserve.setId(rs.getInt("id"));
                 reserve.setRoom_id(rs.getInt("room_id"));
                 reserve.setUser_id(rs.getInt("user_id"));
                 reserve.setStart_time(rs.getTimestamp("start_time").toLocalDateTime());
@@ -73,24 +73,29 @@ public class RoomHistoryDaolmp implements RoomHistoryDao{
 	}
 	
 	@Override
-	public void setReserve(Room_history reserve, Connection con) throws SQLException{
-        PreparedStatement stmt = null;
-        try {
-            String sql = " Insert INTO Room_history(id, room_id, user_id, start_time, end_time, user_count) VALUES(?, ?, ?, ?, ?, ?) ";
-            stmt = con.prepareStatement(sql);
-            int idx = 1;
-            stmt.setInt(idx++, reserve.getId());
-            stmt.setInt(idx++, reserve.getRoom_id());
-            stmt.setInt(idx++, reserve.getUser_id());
-            stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getStart_time()));
-            stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getEnd_time()));
-            stmt.setInt(idx++, reserve.getUser_count());
-            stmt.executeUpdate();
-        }
-        finally {
-        	stmt.close();
-        }
-	};
+	public int setReserve(Room_history reserve, Connection con) throws SQLException {
+	    PreparedStatement stmt = null;
+	    try {
+	        String sql = "INSERT INTO Room_history(room_id, user_id, start_time, end_time, user_count) VALUES(?, ?, ?, ?, ?)";
+	        stmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+	        int idx = 1;
+	        stmt.setInt(idx++, reserve.getRoom_id());
+	        stmt.setInt(idx++, reserve.getUser_id());
+	        stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getStart_time()));
+	        stmt.setTimestamp(idx++, Timestamp.valueOf(reserve.getEnd_time()));
+	        stmt.setInt(idx++, reserve.getUser_count());
+	        stmt.executeUpdate();
+
+	        // 생성된 id 가져오기
+	        ResultSet rs = stmt.getGeneratedKeys();
+	        if (rs.next()) {
+	            return rs.getInt(1); // 생성된 id 반환
+	        }
+	        return -1;
+	    } finally {
+	        dbutil.close(stmt);
+	    }
+	}
 	
 	@Override
 	public void updateReserve(int id, Room_history reserve, Connection con) throws SQLException {

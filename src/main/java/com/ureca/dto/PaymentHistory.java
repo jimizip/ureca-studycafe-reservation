@@ -9,6 +9,7 @@ public class PaymentHistory {
     private int roomId; // Room FK
     private int price; // 결제 금액 
     private LocalDateTime paymentDate; // 결제 시간 
+    private int roomHistoryId; // room_history FK
     
     public PaymentHistory() {}
 
@@ -34,6 +35,9 @@ public class PaymentHistory {
 
     public LocalDateTime getPaymentDate() { return paymentDate; }
     public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
+    
+    public int getRoomHistoryId() { return roomHistoryId; }
+    public void setRoomHistoryId(int roomHistoryId) { this.roomHistoryId = roomHistoryId; }
 
     @Override
     public String toString() {
