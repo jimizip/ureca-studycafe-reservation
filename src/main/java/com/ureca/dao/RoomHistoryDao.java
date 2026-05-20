@@ -8,7 +8,7 @@ import java.sql.Connection;
 import com.ureca.dto.Room_history;
 public interface RoomHistoryDao {
 	
-	List<Room_history> getReservation(Connection con, int room_id,LocalDateTime date) throws SQLException;
+	List<Room_history> getReservation(int room_id,LocalDateTime date) throws SQLException;
 	
 	List<Room_history> getHistory(int user_id) throws SQLException;
 	

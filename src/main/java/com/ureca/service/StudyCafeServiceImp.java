@@ -179,21 +179,16 @@ public class StudyCafeServiceImp implements StudyCafeService {
     
     // 룸, 날짜 기준 예약 가능 시간 조회
     @Override
-    public List<Boolean> getBookedHours(int roomId, LocalDateTime date){	
-    	Connection con = null;
-    	DBUtil dbutil = DBUtil.getInstance();
+    public List<Boolean> getBookedHours(int roomId, LocalDateTime date){
     	 try {
-    		 
-    		 con = dbutil.getConnection();
     	     List<Boolean> isUsed = new ArrayList<>();
-    	     con.setAutoCommit(false);
 
     	     for (int i = 0; i < 24; i++) {
     	         isUsed.add(false);
     	     }
 
     	     List<Room_history> history =
-    	             roomHistoryDao.getReservation(con, roomId, date);
+    	             roomHistoryDao.getReservation(roomId, date);
 
     	     for (Room_history his : history) {
 
@@ -212,22 +207,11 @@ public class StudyCafeServiceImp implements StudyCafeService {
     	             }
     	         }
     	     }
-    	     con.commit();
     	     return isUsed;
 
     	    }
     	
     	catch(SQLException e) {
-    		try {
-
-                if (con != null) {
-                    con.rollback();
-                }
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                throw new RuntimeException("예약 가능 시간 조회 중 롤백 오류");
-            }
     		e.printStackTrace();
     		throw new RuntimeException("예약 가능 시간 조회 중 오류 발생");
     	}
