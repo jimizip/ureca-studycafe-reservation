@@ -25,8 +25,6 @@ public class Room implements Comparable<Room>, Serializable{
 		return Integer.compare(this.id, o.id);
 	}
 	
-	
-	
 	public void setId(int id) {
 		this.id = id;
 	}
