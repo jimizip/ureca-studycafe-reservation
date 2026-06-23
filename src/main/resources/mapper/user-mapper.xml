@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ureca.user.dao.UserDao">
+
+	<insert id="add" parameterType="com.ureca.user.dto.UserDto">
+		insert into User(name, tel, email, password)
+		values(#{name}, #{tel}, #{email}, #{password})
+	</insert>
+
+	<delete id="remove" parameterType="int">
+		delete from User where id = #{id}
+	</delete>
+
+	<select id="search" parameterType="int" resultType="com.ureca.user.dto.UserDto">
+		select id, name, tel, email, password from User where id = #{id}
+	</select>
+
+	<select id="searchAll" resultType="com.ureca.user.dto.UserDto">
+		select id, name, tel, email, password from User
+	</select>
+
+	<select id="searchByEmail" parameterType="string" resultType="com.ureca.user.dto.UserDto">
+		select id, name, tel, email, password from User where email = #{email}
+	</select>
+</mapper>
