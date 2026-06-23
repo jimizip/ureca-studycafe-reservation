@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ureca.room.dao.RoomDao">
+
+	<select id="search" parameterType="int" resultType="com.ureca.room.dto.RoomDto">
+		select id, room_size, price from Room where id = #{id}
+	</select>
+
+	<select id="searchAll" resultType="com.ureca.room.dto.RoomDto">
+		select id, room_size, price from Room order by id
+	</select>
+</mapper>

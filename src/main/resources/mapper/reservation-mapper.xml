@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ureca.reservation.dao.ReservationDao">
+
+	<select id="getReservation" resultType="com.ureca.reservation.dto.ReservationDto">
+		select id, room_id, user_id, start_time, end_time, user_count
+		  from Room_history
+		 where room_id = #{roomId}
+		   and DATE(start_time) = DATE(#{date})
+	</select>
+
+	<select id="getHistory" parameterType="int" resultType="com.ureca.reservation.dto.ReservationDto">
+		select id, room_id, user_id, start_time, end_time, user_count
+		  from Room_history
+		 where user_id = #{userId}
+		 order by start_time desc
+	</select>
+
+	<insert id="insertReserve" parameterType="com.ureca.reservation.dto.ReservationDto"
+			useGeneratedKeys="true" keyProperty="id">
+		insert into Room_history(room_id, user_id, start_time, end_time, user_count)
+		values(#{roomId}, #{userId}, #{startTime}, #{endTime}, #{userCount})
+	</insert>
+
+	<update id="updateReserve" parameterType="com.ureca.reservation.dto.ReservationDto">
+		update Room_history
+		   set room_id = #{roomId}, user_id = #{userId},
+		       start_time = #{startTime}, end_time = #{endTime}, user_count = #{userCount}
+		 where id = #{id}
+	</update>
+
+	<delete id="removeReserve" parameterType="int">
+		delete from Room_history where id = #{id}
+	</delete>
+</mapper>
