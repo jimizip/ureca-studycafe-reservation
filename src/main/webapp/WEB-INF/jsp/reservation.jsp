@@ -6,60 +6,69 @@
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
-	<title>예약하기 - 스터디카페</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<title>회의실 예약 - STUDY CAFÉ</title>
+	<link href="/assets/css/app.css" rel="stylesheet">
 	<script src="/assets/js/util.js"></script>
-	<style>
-		.slot { display:inline-block; width:48px; padding:6px 0; margin:2px; text-align:center;
-			border-radius:6px; cursor:pointer; font-size:13px; border:1px solid #ccc; }
-		.slot.free { background:#d1e7dd; }
-		.slot.booked { background:#f8d7da; color:#842029; cursor:not-allowed; }
-		.slot.sel { background:#0d6efd; color:#fff; }
-	</style>
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-		<div class="container">
-			<a class="navbar-brand" href="/pages/main">스터디카페</a>
-			<ul class="navbar-nav me-auto">
-				<li class="nav-item"><a class="nav-link active" href="/pages/reservation">예약하기</a></li>
-				<li class="nav-item"><a class="nav-link" href="/pages/payment">결제내역</a></li>
-			</ul>
-			<span class="navbar-text text-white me-3"><%= userDto.getName() %> 님</span>
-			<a class="btn btn-outline-light btn-sm" href="/pages/logout">로그아웃</a>
-		</div>
-	</nav>
+	<div class="app">
+		<aside class="sidebar">
+			<div class="brand">STUDY CAFÉ</div>
+			<div class="menu-label">메뉴</div>
+			<nav>
+				<a href="/pages/main">내 예약</a>
+				<a class="active" href="/pages/reservation">회의실 예약</a>
+				<a href="/pages/payment">결제 내역</a>
+			</nav>
+			<div class="version">v1.0</div>
+		</aside>
 
-	<div class="container mt-4">
-		<h4>회의실 예약</h4>
-		<div class="row g-2 align-items-end mt-2">
-			<div class="col-auto">
-				<label class="form-label">회의실</label>
-				<select class="form-select" id="roomSelect"></select>
-			</div>
-			<div class="col-auto">
-				<label class="form-label">날짜</label>
-				<input type="date" class="form-control" id="dateInput">
-			</div>
-			<div class="col-auto">
-				<label class="form-label">인원</label>
-				<input type="number" class="form-control" id="userCount" value="1" min="1" style="width:90px;">
-			</div>
-			<div class="col-auto">
-				<button class="btn btn-secondary" id="btnSearch">조회</button>
-			</div>
-		</div>
+		<header class="topbar">
+			<span class="user"><b><%= userDto.getName() %></b>님 &nbsp;|&nbsp; <%= userDto.getEmail() %></span>
+			<a class="btn btn-ghost btn-sm" href="/pages/logout">로그아웃</a>
+		</header>
 
-		<div class="mt-4">
-			<p class="text-muted mb-1">시간 슬롯 (초록=가능, 빨강=예약됨) — 시작/종료를 클릭하세요</p>
-			<div id="slotWrapper"></div>
-		</div>
+		<main class="main">
+			<div class="card">
+				<div class="card-head">
+					<h2 class="card-title" id="pageTitle">회의실 예약</h2>
+				</div>
+				<div class="toolbar">
+					<div class="field">
+						<label>회의실</label>
+						<select class="input" id="roomSelect"></select>
+					</div>
+					<div class="field">
+						<label>날짜</label>
+						<input type="date" class="input" id="dateInput">
+					</div>
+					<div class="field">
+						<label>인원</label>
+						<input type="number" class="input w-sm" id="userCount" value="1" min="1">
+					</div>
+					<button class="btn btn-ghost" id="btnSearch">조회</button>
+				</div>
+			</div>
 
-		<div class="mt-3">
-			<span id="selInfo" class="me-3"></span>
-			<span id="priceInfo" class="fw-bold text-primary me-3"></span>
-			<button class="btn btn-primary" id="btnReserve" disabled>예약하기</button>
-		</div>
+			<div class="card">
+				<p class="section-label">시간 선택 <span style="color:var(--muted);font-weight:400;">(1시간 단위 · 연속 선택 가능)</span></p>
+				<div class="slot-grid" id="slotWrapper"></div>
+				<p class="card-sub" style="margin-top:12px;">
+					<span style="color:#e7b3b3;">■</span> 예약됨 &nbsp;
+					<span style="color:#7fa8d6;">■</span> 선택 &nbsp;
+					<span style="color:#6bbf7f;">■</span> 기존 예약(수정)
+				</p>
+			</div>
+
+			<div class="card">
+				<p class="section-label">예약 정보 확인</p>
+				<div class="summary">
+					<span id="selInfo" class="muted">시간을 선택하세요</span>
+					<span id="priceInfo" class="price"></span>
+					<button class="btn btn-gold" id="btnReserve" style="margin-left:auto;" disabled>예약하기</button>
+				</div>
+			</div>
+		</main>
 	</div>
 
 	<script>
@@ -67,6 +76,8 @@
 		let SELECTED_START = null; // hour int
 		let SELECTED_END = null;   // hour int (exclusive end = endHour)
 		let EDIT_ID = null;        // 수정 모드면 예약 id
+		let ORIGIN_START = null;   // 수정 모드 기존 예약 구간 (그린 표시용)
+		let ORIGIN_END = null;
 
 		window.onload = async function() {
 			await loadRooms();
@@ -77,14 +88,16 @@
 			if (p.get("editId")) {
 				// 수정 모드: 기존 예약값 프리필
 				EDIT_ID = parseInt(p.get("editId"));
-				document.querySelector("h4").textContent = "회의실 예약 수정";
-				document.querySelector("#btnReserve").textContent = "수정하기";
+				ORIGIN_START = parseInt(p.get("start"));
+				ORIGIN_END = parseInt(p.get("end"));
+				document.querySelector("#pageTitle").textContent = "회의실 예약 수정";
+				document.querySelector("#btnReserve").textContent = "수정 확정";
 				document.querySelector("#roomSelect").value = p.get("roomId");
 				document.querySelector("#dateInput").value = p.get("date");
 				document.querySelector("#userCount").value = p.get("userCount");
 				await loadSlots();
-				SELECTED_START = parseInt(p.get("start"));
-				SELECTED_END = parseInt(p.get("end"));
+				SELECTED_START = ORIGIN_START;
+				SELECTED_END = ORIGIN_END;
 				repaint();
 				updateSelInfo();
 			} else {
@@ -98,7 +111,7 @@
 			ROOMS = data.list || [];
 			let html = "";
 			ROOMS.forEach(r => {
-				html += `<option value="${r.id}" data-price="${r.price}" data-size="${r.roomSize}">${r.id}번 (${r.roomSize}인, ${r.price.toLocaleString()}원/시간)</option>`;
+				html += `<option value="${r.id}" data-price="${r.price}" data-size="${r.roomSize}">룸 ${r.id} · 최대 ${r.roomSize}명 · 시간당 ${r.price.toLocaleString()}원</option>`;
 			});
 			document.querySelector("#roomSelect").innerHTML = html;
 		}
@@ -120,8 +133,9 @@
 			const booked = data.bookedHours || [];
 			let html = "";
 			for (let h = 0; h < 24; h++) {
-				const cls = booked[h] ? "booked" : "free";
-				html += `<span class="slot ${cls}" data-h="${h}" onclick="pickSlot(${h}, ${booked[h]})">${String(h).padStart(2,"0")}</span>`;
+				let cls = booked[h] ? "booked" : "free";
+				if (EDIT_ID !== null && ORIGIN_START !== null && h >= ORIGIN_START && h < ORIGIN_END) cls += " origin";
+				html += `<span class="slot ${cls}" data-h="${h}" onclick="pickSlot(${h}, ${booked[h]})">${String(h).padStart(2,"0")}:00</span>`;
 			}
 			document.querySelector("#slotWrapper").innerHTML = html;
 		}
@@ -155,7 +169,7 @@
 		function updateSelInfo() {
 			const btn = document.querySelector("#btnReserve");
 			if (SELECTED_START === null) {
-				document.querySelector("#selInfo").textContent = "";
+				document.querySelector("#selInfo").textContent = "시간을 선택하세요";
 				document.querySelector("#priceInfo").textContent = "";
 				btn.disabled = true;
 				return;

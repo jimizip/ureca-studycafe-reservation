@@ -1,0 +1,238 @@
+/* ===== 스터디카페 다크+골드 디자인 시스템 ===== */
+:root {
+	--bg: #141414;
+	--bg2: #1c1c1c;
+	--panel: #232323;
+	--panel2: #2a2a2a;
+	--border: #363636;
+	--gold: #d4a84b;
+	--gold-dim: #b8902f;
+	--text: #e6e6e6;
+	--muted: #9a9a9a;
+	--danger: #8b3030;
+	--danger-hi: #a63a3a;
+	--blue: #2a5a8a;
+	--blue-hi: #356fa8;
+	--red-slot: #5a2222;
+	--green: #2e6b3f;
+	--radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.brand {
+	font-weight: 800;
+	letter-spacing: 2px;
+	color: var(--gold);
+}
+
+/* ---------- 앱 셸: 사이드바 + 상단바 ---------- */
+.app {
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	grid-template-rows: 56px 1fr;
+	grid-template-areas: "sidebar topbar" "sidebar main";
+	min-height: 100vh;
+}
+
+.sidebar {
+	grid-area: sidebar;
+	background: var(--bg2);
+	border-right: 1px solid var(--border);
+	display: flex;
+	flex-direction: column;
+	padding: 18px 0;
+}
+.sidebar .brand { font-size: 20px; padding: 6px 20px 22px; }
+.sidebar .menu-label {
+	font-size: 12px; color: var(--muted);
+	padding: 0 20px 8px;
+}
+.sidebar nav { display: flex; flex-direction: column; }
+.sidebar nav a {
+	color: var(--text);
+	padding: 12px 20px;
+	border-left: 3px solid transparent;
+	font-size: 14px;
+}
+.sidebar nav a:hover { background: var(--panel); text-decoration: none; }
+.sidebar nav a.active {
+	background: var(--panel);
+	border-left-color: var(--gold);
+	color: var(--gold);
+	font-weight: 600;
+}
+.sidebar .version {
+	margin-top: auto;
+	padding: 12px 20px 0;
+	color: var(--muted);
+	font-size: 12px;
+}
+
+.topbar {
+	grid-area: topbar;
+	background: var(--bg2);
+	border-bottom: 1px solid var(--border);
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 16px;
+	padding: 0 24px;
+}
+.topbar .user { color: var(--muted); font-size: 13px; }
+.topbar .user b { color: var(--text); font-weight: 600; }
+
+.main { grid-area: main; padding: 24px; overflow: auto; }
+
+/* ---------- 카드 패널 ---------- */
+.card {
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: 20px 22px;
+	margin-bottom: 18px;
+}
+.card-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 6px;
+}
+.card-title { color: var(--gold); font-size: 18px; font-weight: 700; margin: 0; }
+.card-sub { color: var(--muted); font-size: 13px; margin: 2px 0 0; }
+.section-label {
+	color: var(--gold);
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 0 10px;
+}
+
+/* ---------- 버튼 ---------- */
+.btn {
+	display: inline-block;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	padding: 8px 16px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	background: var(--panel2);
+	color: var(--text);
+	transition: filter .15s, background .15s;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.btn-gold { background: var(--gold); color: #1a1a1a; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); filter: none; }
+.btn-sm { padding: 5px 12px; font-size: 13px; }
+.btn-block { display: block; width: 100%; }
+
+/* ---------- 폼 ---------- */
+.field { margin-bottom: 14px; }
+.field label { display: block; color: var(--gold); font-size: 13px; margin-bottom: 6px; }
+.input, select.input, input.input {
+	width: 100%;
+	background: var(--bg2);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	color: var(--text);
+	padding: 9px 11px;
+	font-size: 14px;
+}
+.input:focus { outline: none; border-color: var(--gold); }
+select.input option { background: var(--bg2); }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.toolbar .field { margin-bottom: 0; }
+.w-sm { width: 110px; }
+
+/* ---------- 테이블 ---------- */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead th {
+	color: var(--gold);
+	text-align: left;
+	font-weight: 600;
+	font-size: 13px;
+	padding: 12px 10px;
+	border-bottom: 1px solid var(--border);
+}
+.data-table tbody td {
+	padding: 12px 10px;
+	border-bottom: 1px solid #2b2b2b;
+	font-size: 14px;
+}
+.data-table tbody tr:hover { background: var(--panel2); }
+.data-table .gold { color: var(--gold); }
+.data-table .muted-row td { color: var(--muted); text-align: center; }
+
+/* ---------- 슬롯 그리드 ---------- */
+.slot-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot {
+	width: 64px;
+	padding: 10px 0;
+	text-align: center;
+	border-radius: 8px;
+	font-size: 13px;
+	cursor: pointer;
+	border: 1px solid var(--border);
+	background: var(--bg2);
+	color: var(--text);
+	user-select: none;
+}
+.slot.free:hover { border-color: var(--gold); }
+.slot.booked { background: var(--red-slot); color: #e7b3b3; cursor: not-allowed; border-color: #6a2a2a; }
+.slot.sel { background: var(--blue); border-color: var(--blue-hi); color: #fff; }
+.slot.origin { border-color: var(--green); }
+
+/* ---------- 룸 목록 ---------- */
+.room-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 14px;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	margin-bottom: 8px;
+	background: var(--bg2);
+}
+.room-row .meta { color: var(--muted); font-size: 13px; }
+
+/* ---------- 예약 정보 요약 ---------- */
+.summary { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.summary .price { color: var(--gold); font-weight: 700; font-size: 16px; }
+
+/* ---------- 중앙 정렬 (로그인/회원가입) ---------- */
+.center-wrap {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+}
+.auth-title { font-size: 34px; margin: 0 0 4px; }
+.auth-sub { color: var(--muted); margin: 0 0 26px; letter-spacing: 1px; }
+.auth-card {
+	width: 100%;
+	max-width: 420px;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 14px;
+	padding: 26px 24px;
+}
+.auth-foot { text-align: center; margin-top: 16px; font-size: 13px; }

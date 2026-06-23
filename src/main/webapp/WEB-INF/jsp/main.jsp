@@ -6,31 +6,45 @@
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
-	<title>메인 - 스터디카페</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<title>내 예약 - STUDY CAFÉ</title>
+	<link href="/assets/css/app.css" rel="stylesheet">
 	<script src="/assets/js/util.js"></script>
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-		<div class="container">
-			<a class="navbar-brand" href="/pages/main">스터디카페</a>
-			<ul class="navbar-nav me-auto">
-				<li class="nav-item"><a class="nav-link" href="/pages/reservation">예약하기</a></li>
-				<li class="nav-item"><a class="nav-link" href="/pages/payment">결제내역</a></li>
-			</ul>
-			<span class="navbar-text text-white me-3"><%= userDto.getName() %> 님</span>
-			<a class="btn btn-outline-light btn-sm" href="/pages/logout">로그아웃</a>
-		</div>
-	</nav>
+	<div class="app">
+		<aside class="sidebar">
+			<div class="brand">STUDY CAFÉ</div>
+			<div class="menu-label">메뉴</div>
+			<nav>
+				<a class="active" href="/pages/main">내 예약</a>
+				<a href="/pages/reservation">회의실 예약</a>
+				<a href="/pages/payment">결제 내역</a>
+			</nav>
+			<div class="version">v1.0</div>
+		</aside>
 
-	<div class="container mt-4">
-		<h4>내 예약 현황</h4>
-		<table class="table table-hover mt-3">
-			<thead>
-				<tr><th>예약번호</th><th>방</th><th>시작</th><th>종료</th><th>인원</th><th></th></tr>
-			</thead>
-			<tbody id="reservationTbody"></tbody>
-		</table>
+		<header class="topbar">
+			<span class="user"><b><%= userDto.getName() %></b>님 &nbsp;|&nbsp; <%= userDto.getEmail() %></span>
+			<a class="btn btn-ghost btn-sm" href="/pages/logout">로그아웃</a>
+		</header>
+
+		<main class="main">
+			<div class="card">
+				<div class="card-head">
+					<div>
+						<h2 class="card-title">내 예약 현황</h2>
+						<p class="card-sub">예약을 수정하거나 취소할 수 있습니다</p>
+					</div>
+					<a class="btn btn-gold" href="/pages/reservation">+ 회의실 예약</a>
+				</div>
+				<table class="data-table">
+					<thead>
+						<tr><th>예약번호</th><th>방</th><th>시작</th><th>종료</th><th>인원</th><th></th></tr>
+					</thead>
+					<tbody id="reservationTbody"></tbody>
+				</table>
+			</div>
+		</main>
 	</div>
 
 	<script>
@@ -45,17 +59,17 @@
 				html += `
 					<tr>
 						<td>${r.id}</td>
-						<td>${r.roomId}번</td>
+						<td class="gold">${r.roomId}번</td>
 						<td>${fmtDateTime(r.startTime)}</td>
 						<td>${fmtDateTime(r.endTime)}</td>
 						<td>${r.userCount}명</td>
 						<td>
-							<button class="btn btn-sm btn-outline-primary" onclick="editReservation(${r.id}, ${r.roomId}, '${r.startTime}', '${r.endTime}', ${r.userCount})">수정</button>
-							<button class="btn btn-sm btn-outline-danger" onclick="cancelReservation(${r.id})">취소</button>
+							<button class="btn btn-ghost btn-sm" onclick="editReservation(${r.id}, ${r.roomId}, '${r.startTime}', '${r.endTime}', ${r.userCount})">수정</button>
+							<button class="btn btn-danger btn-sm" onclick="cancelReservation(${r.id})">취소</button>
 						</td>
 					</tr>`;
 			});
-			document.querySelector("#reservationTbody").innerHTML = html || `<tr><td colspan="6" class="text-center text-muted">예약 없음</td></tr>`;
+			document.querySelector("#reservationTbody").innerHTML = html || `<tr class="muted-row"><td colspan="6">예약 없음</td></tr>`;
 		}
 
 		function editReservation(id, roomId, startTime, endTime, userCount) {

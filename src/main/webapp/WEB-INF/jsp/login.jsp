@@ -3,26 +3,26 @@
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
-	<title>로그인 - 스터디카페</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<title>로그인 - STUDY CAFÉ</title>
+	<link href="/assets/css/app.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-	<div class="container" style="max-width: 420px; margin-top: 100px;">
-		<h3 class="text-center mb-4">스터디카페 예약</h3>
-		<div class="card shadow-sm">
-			<div class="card-body">
-				<div class="mb-3">
-					<label class="form-label">이메일</label>
-					<input type="email" class="form-control" id="email" placeholder="email@ureca.com">
-				</div>
-				<div class="mb-3">
-					<label class="form-label">비밀번호</label>
-					<input type="password" class="form-control" id="password">
-				</div>
-				<button class="btn btn-primary w-100" id="btnLogin">로그인</button>
-				<div class="text-center mt-3">
-					<a href="/pages/register">회원가입</a>
-				</div>
+<body>
+	<div class="center-wrap">
+		<h1 class="brand auth-title">STUDY CAFÉ</h1>
+		<p class="auth-sub">예약 관리 시스템</p>
+
+		<div class="auth-card">
+			<div class="field">
+				<label>이메일</label>
+				<input type="email" class="input" id="email" placeholder="email@ureca.com">
+			</div>
+			<div class="field">
+				<label>비밀번호</label>
+				<input type="password" class="input" id="password">
+			</div>
+			<button class="btn btn-gold btn-block" id="btnLogin">로그인</button>
+			<div class="auth-foot">
+				계정이 없으신가요? <a href="/pages/register">회원가입</a>
 			</div>
 		</div>
 	</div>
